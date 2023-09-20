@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.ParticleSystemJobs;
 
 public class PlayerController : MonoBehaviour
 {
