@@ -6,7 +6,6 @@ public class DraggableElement : MonoBehaviour, IDragHandler
 {
     [SerializeField] private Transform worldCollider;
 
-
     void Update()
     {
         Vector3 position = Camera.main.ScreenToWorldPoint(transform.position);
