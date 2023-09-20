@@ -1,21 +1,23 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.ParticleSystemJobs;
 
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float runSpeed = 40f;
-    [SerializeField] private float m_JumpForce = 400f;                          // Amount of force added when the player jumps.
-    [Range(0, .3f)][SerializeField] private float m_MovementSmoothing = .05f;   // How much to smooth out the movement
-    [SerializeField] private bool m_AirControl = false;                         // Whether or not a player can steer while jumping;
-    [SerializeField] private LayerMask m_WhatIsGround;                          // A mask determining what is ground to the character
-    [SerializeField] private Transform m_GroundCheck;                           // A position marking where to check if the player is grounded.
+    [SerializeField] private float m_JumpForce = 400f;
+    [Range(0, 0.3f)][SerializeField] private float m_MovementSmoothing = 0.05f;
+    [SerializeField] private bool m_AirControl = false;
+    [SerializeField] private LayerMask m_WhatIsGround;
+    [SerializeField] private Transform m_GroundCheck;
+    [SerializeField] private Animator animator;
+    [SerializeField] private ParticleSystem walkEffect;
 
-    private float horizontalMove = 0f;
+    private float hInput = 0f;
     private bool jump = false;
-    const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
-    private bool m_Grounded;            // Whether or not the player is grounded.
+    private bool m_Grounded = false;
+    private bool m_FacingRight = true;
     private Rigidbody2D m_Rigidbody2D;
-    private bool m_FacingRight = true;  // For determining which way the player is currently facing.
     private Vector3 m_Velocity = Vector3.zero;
 
     private void Awake()
@@ -25,7 +27,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        horizontalMove = Input.GetAxisRaw("Horizontal") * runSpeed;
+        hInput = Input.GetAxisRaw("Horizontal") * runSpeed;
 
         if (Input.GetButtonDown("Jump"))
         {
@@ -37,16 +39,14 @@ public class PlayerController : MonoBehaviour
     {
         m_Grounded = false;
 
-        // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
-        // This can be done using layers instead but Sample Assets will not overwrite your project settings.
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, 0.2f, m_WhatIsGround);
         for (int i = 0; i < colliders.Length; i++)
         {
             if (colliders[i].gameObject != gameObject)
                 m_Grounded = true;
         }
 
-        Move(horizontalMove * Time.fixedDeltaTime, jump);
+        Move(hInput * Time.fixedDeltaTime, jump);
         jump = false;
     }
 
@@ -82,6 +82,24 @@ public class PlayerController : MonoBehaviour
             m_Grounded = false;
             m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
         }
+
+        // Moving smoke effect.
+        if (move == 0.0f || m_Grounded == false)
+        {
+            var emissionModule = walkEffect.emission;
+            emissionModule.rateOverTime = 0;
+        }
+        else if (move != 0.0f && m_Grounded == true)
+        {
+            var emissionModule = walkEffect.emission;
+            emissionModule.rateOverTime = 20;
+        }
+
+        // Walking animation.
+        animator.SetBool("isMoving", move != 0.0f);
+
+        // Jumping animation.
+        animator.SetBool("isGrounded", m_Grounded);
     }
 
     private void Flip()
