@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerHUDManager : MonoBehaviour
 {
     [SerializeField] private Slider healthBarSlider;
     [SerializeField] private Animator deathScreenAnimator;
+    [SerializeField] private TextMeshProUGUI gemCountText;
 
     private PlayerStats m_PlayerStats;
 
@@ -17,6 +19,7 @@ public class PlayerHUDManager : MonoBehaviour
     void Update()
     {
         healthBarSlider.value = m_PlayerStats.Health;
+        gemCountText.text = m_PlayerStats.GetGemCount().ToString();
     }
 
     private void OnPlayerDie()

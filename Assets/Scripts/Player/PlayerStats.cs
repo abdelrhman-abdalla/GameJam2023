@@ -14,18 +14,34 @@ public class PlayerStats : MonoBehaviour
         private set { m_Health = value; }
     }
 
+    private int m_GemCount = 0;
+
     public delegate void PlayerDieAction();
     public event PlayerDieAction OnPlayerDie;
 
     private const float DamageCooldown = 2;
     private float m_LastDamageTakenTime = -1000;
 
+    private void Update()
+    {
+        if (IsInvincibleCooldown() == true)
+        {
+            Color color = playerSpriteRenderer.color;
+            color.a = (Mathf.Sin(Time.time * 20) + 2) / 3;
+            playerSpriteRenderer.color = color;
+        }
+        else
+        {
+            playerSpriteRenderer.color = new Color(1, 1, 1, 1);
+        }
+    }
+
     public void ApplyDamages(float damage)
     {
         if (m_Health <= 0 || damage == 0)
             return;
 
-        if (Time.time - m_LastDamageTakenTime <= DamageCooldown)
+        if (IsInvincibleCooldown() == true)
             return;
 
         m_Health -= damage;
@@ -35,10 +51,6 @@ public class PlayerStats : MonoBehaviour
         {
             m_Health = 0;
             Kill();
-        }
-        else
-        {
-            StartCoroutine(DamageAnimation(10));
         }
     }
 
@@ -51,12 +63,17 @@ public class PlayerStats : MonoBehaviour
         if (OnPlayerDie != null)
             OnPlayerDie();
 
-        StartCoroutine(DelayedRestart(3f));
+        StartCoroutine(DelayedRestart(DamageCooldown));
     }
 
     public bool IsAlive()
     {
         return m_Health > 0;
+    }
+
+    public bool IsInvincibleCooldown()
+    {
+        return Time.time - m_LastDamageTakenTime <= DamageCooldown;
     }
 
     private IEnumerator DelayedRestart(float delay)
@@ -66,18 +83,13 @@ public class PlayerStats : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    private IEnumerator DamageAnimation(float duration)
+    public void AddGem()
+    { 
+        m_GemCount++; 
+    }
+
+    public int GetGemCount()
     {
-        float startTime = Time.time;
-
-        while(Time.time - startTime < duration)
-        {
-            Color color = playerSpriteRenderer.color;
-            color.a = (Mathf.Sin(Time.time * 10) + 2) / 3;
-            playerSpriteRenderer.color = color;
-            yield return new WaitForSeconds(Time.deltaTime);
-        }
-
-        playerSpriteRenderer.color = new Color(1, 1, 1, 1);
+        return m_GemCount;
     }
 }
