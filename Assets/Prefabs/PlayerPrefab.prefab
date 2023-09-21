@@ -5918,7 +5918,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthBarSlider: {fileID: 9112481787600892689}
   deathScreenAnimator: {fileID: 9112481787261238995}
-  gemCountText: {fileID: 0}
+  gemCountText: {fileID: 1133951640}
 --- !u!1 &9112481786350562594
 GameObject:
   m_ObjectHideFlags: 0
