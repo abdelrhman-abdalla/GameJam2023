@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float runSpeed = 40f;
     [SerializeField] private float jumpForce = 400f;
     [SerializeField] private float holdJumpMax = 0.8f;
+    [SerializeField] private float groundedThresholdTime = 0.8f;
     [Range(0, 0.3f)][SerializeField] private float movementSmoothing = 0.05f;
     [SerializeField] private bool airControl = false;
     [SerializeField] private LayerMask groundLayer;
@@ -13,7 +14,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private ParticleSystem walkEffect;
 
     private float m_HorizontalInput = 0f;
-    private bool m_IsJumping = false;
+    public bool m_IsJumping = false, m_JumpInput = false;
+    private float m_StartJumpingTime = -1000f;
+    private float m_LastGroundedTime = -1000f;
     private bool m_FacingRight = true;
     private Rigidbody2D m_Rigidbody2D;
     private Vector3 m_Velocity = Vector3.zero;
@@ -31,11 +34,7 @@ public class PlayerController : MonoBehaviour
         // Retreive all inputs.
 
         m_HorizontalInput = Input.GetAxisRaw("Horizontal") * runSpeed;
-
-        if (Input.GetButtonDown("Jump"))
-        {
-            m_IsJumping = true;
-        }
+        m_JumpInput = Input.GetButton("Jump");
     }
 
     private void FixedUpdate()
@@ -43,12 +42,11 @@ public class PlayerController : MonoBehaviour
         if (GetComponent<PlayerStats>().IsAlive() == false)
             return;
 
-        bool isGrounded = IsGrounded();
         bool isMoving = IsMoving();
 
         // Walk.
 
-        if (isGrounded || airControl)
+        if (IsGrounded(false) || airControl)
         {
             // Move the player in the correct direction.
             Vector3 targetVelocity = new Vector2(m_HorizontalInput * Time.fixedDeltaTime * 10f, m_Rigidbody2D.velocity.y);
@@ -67,38 +65,70 @@ public class PlayerController : MonoBehaviour
 
         // Jump.
 
-        if (isGrounded && m_IsJumping)
+        if (m_JumpInput == true)
         {
-            // Add a vertical force to the player.
-            m_Rigidbody2D.AddForce(new Vector2(0f, jumpForce));
+            if (m_IsJumping == true)
+            {
+                m_Rigidbody2D.AddForce(new Vector2(0f, jumpForce / 20));
+            } 
+            else
+            {
+                if (IsGrounded(true) == true)
+                {
+                    // Start impulse.
+                    m_Rigidbody2D.AddForce(new Vector2(0f, jumpForce));
+                    m_IsJumping = true;
+                    m_StartJumpingTime = Time.time;
+                }
+            }
         }
 
-        m_IsJumping = false;
+        if(m_IsJumping == true)
+        {
+            if (IsGrounded(false) && Time.time - m_StartJumpingTime > 0.1)
+            {
+                m_IsJumping = false;
+            }
+
+            if (Time.time - m_StartJumpingTime > holdJumpMax)
+            {
+                m_IsJumping = false;
+            }
+        }
 
         // Animations and effects.
 
         animator.SetBool("isMoving", IsMoving());
-        animator.SetBool("isGrounded", isGrounded);
+        animator.SetBool("isGrounded", IsGrounded(false));
 
-        if (isMoving == false || isGrounded == false)
+        if (isMoving == false || IsGrounded(false) == false)
         {
             var emissionModule = walkEffect.emission;
             emissionModule.rateOverTime = 0;
         }
-        else if (isMoving == true && isGrounded == true)
+        else if (isMoving == true && IsGrounded(false) == true)
         {
             var emissionModule = walkEffect.emission;
             emissionModule.rateOverTime = 20;
         }
     }
 
-    private bool IsGrounded()
+    private bool IsGrounded(bool threshold = false)
     {
+        if(threshold == true)
+        {
+            if (Time.time - m_LastGroundedTime < groundedThresholdTime)
+                return true;
+        }
+
         Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheckTransform.position, 0.2f, groundLayer);
         for (int i = 0; i < colliders.Length; i++)
         {
             if (colliders[i].gameObject != gameObject)
+            {
+                m_LastGroundedTime = Time.time;
                 return true;
+            }
         }
 
         return false;
