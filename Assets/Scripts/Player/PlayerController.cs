@@ -4,6 +4,7 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float runSpeed = 40f;
     [SerializeField] private float jumpForce = 400f;
+    [SerializeField] private float holdJumpMax = 0.8f;
     [Range(0, 0.3f)][SerializeField] private float movementSmoothing = 0.05f;
     [SerializeField] private bool airControl = false;
     [SerializeField] private LayerMask groundLayer;

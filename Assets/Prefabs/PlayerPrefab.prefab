@@ -6773,8 +6773,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6a82fd1512f72c4c8bd46f01fdd9f7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runSpeed: 50
-  jumpForce: 400
+  runSpeed: 60
+  jumpForce: 600
   movementSmoothing: 0.05
   airControl: 1
   groundLayer:
@@ -6813,7 +6813,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 9112481787522684856}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 956e8677916245841a7f80a41052d75d, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -6839,7 +6839,7 @@ CircleCollider2D:
   m_GameObject: {fileID: 9112481787522684856}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 956e8677916245841a7f80a41052d75d, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
