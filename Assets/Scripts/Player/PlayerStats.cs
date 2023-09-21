@@ -60,10 +60,10 @@ public class PlayerStats : MonoBehaviour
 
         Debug.Log("Player die.");
 
-        if (OnPlayerDie != null)
-            OnPlayerDie();
+        SceneManager.LoadScene(2);
 
-        StartCoroutine(DelayedRestart(DamageCooldown));
+        /*if (OnPlayerDie != null)
+            OnPlayerDie();*/
     }
 
     public bool IsAlive()
@@ -74,13 +74,6 @@ public class PlayerStats : MonoBehaviour
     public bool IsInvincibleCooldown()
     {
         return Time.time - m_LastDamageTakenTime <= DamageCooldown;
-    }
-
-    private IEnumerator DelayedRestart(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        // Reload current scene.
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void AddGem()
