@@ -27,7 +27,7 @@ public class PlayerStats : MonoBehaviour
         if (IsInvincibleCooldown() == true)
         {
             Color color = playerSpriteRenderer.color;
-            color.a = (Mathf.Sin(Time.time * 20) + 2) / 3;
+            color.a = (Mathf.Sin(Time.time * 30) + 2) / 3;
             playerSpriteRenderer.color = color;
         }
         else

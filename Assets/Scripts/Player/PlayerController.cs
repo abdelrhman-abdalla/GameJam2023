@@ -4,7 +4,6 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float runSpeed = 40f;
     [SerializeField] private float jumpForce = 400f;
-    [SerializeField] private float holdJumpMax = 0.8f;
     [SerializeField] private float groundedThresholdTime = 0.8f;
     [Range(0, 0.3f)][SerializeField] private float movementSmoothing = 0.05f;
     [SerializeField] private bool airControl = false;
@@ -67,30 +66,23 @@ public class PlayerController : MonoBehaviour
 
         if (m_JumpInput == true)
         {
-            if (m_IsJumping == true)
+            if (IsGrounded(true) == true && m_IsJumping == false)
             {
-                m_Rigidbody2D.AddForce(new Vector2(0f, jumpForce / 20));
-            } 
-            else
-            {
-                if (IsGrounded(true) == true)
-                {
-                    // Start impulse.
-                    m_Rigidbody2D.AddForce(new Vector2(0f, jumpForce));
-                    m_IsJumping = true;
-                    m_StartJumpingTime = Time.time;
-                }
+                // Start impulse.
+                m_Rigidbody2D.AddForce(new Vector2(0f, jumpForce));
+                m_IsJumping = true;
+                m_StartJumpingTime = Time.time;
             }
         }
 
         if(m_IsJumping == true)
         {
-            if (IsGrounded(false) && Time.time - m_StartJumpingTime > 0.1)
+            if (IsGrounded(false) == true && Time.time - m_StartJumpingTime > 0.1)
             {
                 m_IsJumping = false;
             }
 
-            if (Time.time - m_StartJumpingTime > holdJumpMax)
+            if(m_JumpInput == false)
             {
                 m_IsJumping = false;
             }
@@ -117,18 +109,15 @@ public class PlayerController : MonoBehaviour
     {
         if(threshold == true)
         {
-            if (Time.time - m_LastGroundedTime < groundedThresholdTime)
+            if (Time.time - m_LastGroundedTime <= groundedThresholdTime)
                 return true;
         }
 
         Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheckTransform.position, 0.2f, groundLayer);
-        for (int i = 0; i < colliders.Length; i++)
+        if(colliders.Length > 0)
         {
-            if (colliders[i].gameObject != gameObject)
-            {
-                m_LastGroundedTime = Time.time;
-                return true;
-            }
+            m_LastGroundedTime = Time.time;
+            return true;
         }
 
         return false;
