@@ -23,8 +23,9 @@ public class SettingsMenu : MonoBehaviour
         audioMixer.GetFloat("Sound", out float soundValueForSlider);
         soundSlider.value = soundValueForSlider;*/
 
-        resolutions = Screen.resolutions.Select(resolution => new Resolution { width = resolution.width, height = resolution.height }).Distinct().ToArray();
         resolutionDropdown.ClearOptions();
+
+        resolutions = Screen.resolutions.Select(resolution => new Resolution { width = resolution.width, height = resolution.height }).Distinct().ToArray();
 
         List<string> options = new List<string>();
 
@@ -39,7 +40,6 @@ public class SettingsMenu : MonoBehaviour
                 currentResolutionIndex = i;
             }
         }
-
         resolutionDropdown.AddOptions(options);
         resolutionDropdown.value = currentResolutionIndex;
         resolutionDropdown.RefreshShownValue();
