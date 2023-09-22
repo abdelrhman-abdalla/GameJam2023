@@ -33,7 +33,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -295,12 +295,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      sun_7: -676322149
       sun_0: -1979712585
       sun_3: 1507160956
       sun_4: -548246375
       sun_5: 1963141090
       sun_6: -345473323
+      sun_7: -676322149
       sun_2: 1059755622
       sun_1: -1889233399
   spritePackingTag: 
