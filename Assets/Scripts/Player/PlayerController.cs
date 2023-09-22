@@ -16,12 +16,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip jumpSound;
 
     private float m_HorizontalInput = 0f;
-    public bool m_IsJumping = false, m_JumpInput = false;
+    private bool m_JumpInput = false;
     private bool m_FacingRight = true;
     private Rigidbody2D m_Rigidbody2D;
     private Vector3 m_Velocity = Vector3.zero;
 
-    private void Awake()
+    private async void Awake()
     {
         m_Rigidbody2D = GetComponent<Rigidbody2D>();
     }
