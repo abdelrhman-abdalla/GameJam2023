@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D m_Rigidbody2D;
     private Vector3 m_Velocity = Vector3.zero;
 
-    private async void Awake()
+    private void Awake()
     {
         m_Rigidbody2D = GetComponent<Rigidbody2D>();
     }
