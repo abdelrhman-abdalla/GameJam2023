@@ -10,11 +10,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform groundCheckTransform;
     [SerializeField] private Animator animator;
     [SerializeField] private ParticleSystem walkEffect;
+    [Space]
+    [SerializeField] private AudioSource walkAudioSource;
+    [SerializeField] private AudioSource otherAudioSource;
+    [SerializeField] private AudioClip jumpSound;
 
     private float m_HorizontalInput = 0f;
     public bool m_IsJumping = false, m_JumpInput = false;
-    private float m_StartJumpingTime = -1000f;
-    private float m_LastGroundedTime = -1000f;
     private bool m_FacingRight = true;
     private Rigidbody2D m_Rigidbody2D;
     private Vector3 m_Velocity = Vector3.zero;
@@ -32,7 +34,11 @@ public class PlayerController : MonoBehaviour
         // Retreive all inputs.
 
         m_HorizontalInput = Input.GetAxisRaw("Horizontal") * runSpeed;
-        m_JumpInput = Input.GetButton("Jump");
+
+        if(Input.GetButtonDown("Jump"))
+        {
+            m_JumpInput = true;
+        }
     }
 
     private void FixedUpdate()
@@ -64,29 +70,12 @@ public class PlayerController : MonoBehaviour
 
         // Jump.
 
-        if (m_JumpInput == true)
+        if (m_JumpInput == true && isGrounded == true)
         {
-            if (isGrounded == true && m_IsJumping == false)
-            {
-                // Start impulse.
-                m_Rigidbody2D.AddForce(new Vector2(0f, jumpForce));
-                m_IsJumping = true;
-                m_StartJumpingTime = Time.time;
-            }
+            m_Rigidbody2D.AddForce(new Vector2(0f, jumpForce));
+            otherAudioSource.PlayOneShot(jumpSound);
         }
-
-        if(m_IsJumping == true)
-        {
-            if (isGrounded == true && Time.time - m_StartJumpingTime > 0.1)
-            {
-                m_IsJumping = false;
-            }
-
-            if(m_JumpInput == false)
-            {
-                m_IsJumping = false;
-            }
-        }
+        m_JumpInput = false;
 
         // Animations and effects.
 
@@ -102,6 +91,17 @@ public class PlayerController : MonoBehaviour
         {
             var emissionModule = walkEffect.emission;
             emissionModule.rateOverTime = 20;
+        }
+
+        // Audio
+
+        if(isMoving == true && walkAudioSource.isPlaying == false)
+        {
+            walkAudioSource.Play();
+        }
+        else if (isMoving == false && walkAudioSource.isPlaying == true)
+        {
+            walkAudioSource.Stop();
         }
     }
 
