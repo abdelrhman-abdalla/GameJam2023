@@ -4,7 +4,6 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float runSpeed = 40f;
     [SerializeField] private float jumpForce = 400f;
-    [SerializeField] private float groundedThresholdTime = 0.8f;
     [Range(0, 0.3f)][SerializeField] private float movementSmoothing = 0.05f;
     [SerializeField] private bool airControl = false;
     [SerializeField] private LayerMask groundLayer;
@@ -42,10 +41,11 @@ public class PlayerController : MonoBehaviour
             return;
 
         bool isMoving = IsMoving();
+        bool isGrounded = IsGrounded();
 
         // Walk.
 
-        if (IsGrounded(false) || airControl)
+        if (isGrounded == true || airControl == true)
         {
             // Move the player in the correct direction.
             Vector3 targetVelocity = new Vector2(m_HorizontalInput * Time.fixedDeltaTime * 10f, m_Rigidbody2D.velocity.y);
@@ -66,7 +66,7 @@ public class PlayerController : MonoBehaviour
 
         if (m_JumpInput == true)
         {
-            if (IsGrounded(true) == true && m_IsJumping == false)
+            if (isGrounded == true && m_IsJumping == false)
             {
                 // Start impulse.
                 m_Rigidbody2D.AddForce(new Vector2(0f, jumpForce));
@@ -77,7 +77,7 @@ public class PlayerController : MonoBehaviour
 
         if(m_IsJumping == true)
         {
-            if (IsGrounded(false) == true && Time.time - m_StartJumpingTime > 0.1)
+            if (isGrounded == true && Time.time - m_StartJumpingTime > 0.1)
             {
                 m_IsJumping = false;
             }
@@ -91,35 +91,28 @@ public class PlayerController : MonoBehaviour
         // Animations and effects.
 
         animator.SetBool("isMoving", IsMoving());
-        animator.SetBool("isGrounded", IsGrounded(false));
+        animator.SetBool("isGrounded", isGrounded);
 
-        if (isMoving == false || IsGrounded(false) == false)
+        if (isMoving == false || isGrounded == false)
         {
             var emissionModule = walkEffect.emission;
             emissionModule.rateOverTime = 0;
         }
-        else if (isMoving == true && IsGrounded(false) == true)
+        else if (isMoving == true && isGrounded == true)
         {
             var emissionModule = walkEffect.emission;
             emissionModule.rateOverTime = 20;
         }
     }
 
-    private bool IsGrounded(bool threshold = false)
+    private bool IsGrounded()
     {
-        if(threshold == true)
-        {
-            if (Time.time - m_LastGroundedTime <= groundedThresholdTime)
-                return true;
-        }
-
         Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheckTransform.position, 0.2f, groundLayer);
+        
         if(colliders.Length > 0)
         {
-            m_LastGroundedTime = Time.time;
             return true;
         }
-
         return false;
     }
 
